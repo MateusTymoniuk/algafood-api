@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Data
@@ -26,5 +27,6 @@ public class Endereco {
     private String bairro;
 
     @ManyToOne
+    @JoinColumn(name = "endereco_cidade_id")
     private Cidade cidade;
 }
