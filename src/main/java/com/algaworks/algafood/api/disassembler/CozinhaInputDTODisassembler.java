@@ -1,4 +1,4 @@
-package com.algaworks.algafood.api.assembler;
+package com.algaworks.algafood.api.disassembler;
 
 import com.algaworks.algafood.api.model.input.CozinhaInputDTO;
 import com.algaworks.algafood.domain.model.Cozinha;

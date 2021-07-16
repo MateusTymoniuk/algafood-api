@@ -1,0 +1,1 @@
+ALTER TABLE produto MODIFY descricao TEXT NOT NULL;

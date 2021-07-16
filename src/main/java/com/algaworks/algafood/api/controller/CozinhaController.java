@@ -1,7 +1,7 @@
 package com.algaworks.algafood.api.controller;
 
 import com.algaworks.algafood.api.assembler.CozinhaDTOAssembler;
-import com.algaworks.algafood.api.assembler.CozinhaInputDTODisassembler;
+import com.algaworks.algafood.api.disassembler.CozinhaInputDTODisassembler;
 import com.algaworks.algafood.api.model.CozinhaDTO;
 import com.algaworks.algafood.api.model.input.CozinhaInputDTO;
 import com.algaworks.algafood.domain.model.Cozinha;

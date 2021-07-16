@@ -1,15 +1,15 @@
 package com.algaworks.algafood.api.controller;
 
 import com.algaworks.algafood.api.assembler.RestauranteDTOAssembler;
-import com.algaworks.algafood.api.assembler.RestauranteInputDTODisassembler;
+import com.algaworks.algafood.api.disassembler.RestauranteInputDTODisassembler;
 import com.algaworks.algafood.api.model.RestauranteDTO;
 import com.algaworks.algafood.api.model.input.RestauranteInputDTO;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.NegocioException;
+import com.algaworks.algafood.domain.exception.RestauranteNaoEncontradoException;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -60,13 +60,9 @@ public class RestauranteController {
     public RestauranteDTO atualizar(@PathVariable Long restauranteId,
                                     @RequestBody @Valid RestauranteInputDTO restauranteInputDTO) {
         try {
-//            Restaurante restaurante = restauranteInputDTODisassembler.toEntity(restauranteInputDTO);
             Restaurante restauranteEncontrado = service.buscar(restauranteId);
 
             restauranteInputDTODisassembler.copyInputToEntity(restauranteInputDTO, restauranteEncontrado);
-
-//            BeanUtils.copyProperties(restaurante, restauranteEncontrado,
-//                "id", "formasPagamento", "endereco", "dataCadastro", "produtos");
 
             return restauranteDTOAssembler.toDTO(service.salvar(restauranteEncontrado));
         } catch (EntidadeNaoEncontradaException e) {
@@ -74,5 +70,47 @@ public class RestauranteController {
         }
     }
 
+    @PutMapping("/{restauranteId}/ativo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void ativar(@PathVariable Long restauranteId) {
+        service.ativar(restauranteId);
+    }
 
+    @DeleteMapping("/{restauranteId}/ativo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void inativar(@PathVariable Long restauranteId) {
+        service.inativar(restauranteId);
+    }
+
+    @PutMapping("/ativacoes")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void ativarEmLote(@RequestBody List<Long> restauranteIds) {
+        try {
+            service.ativarEmLote(restauranteIds);
+        } catch (RestauranteNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
+    }
+
+    @DeleteMapping("/ativacoes")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void inativarEmLote(@RequestBody List<Long> restauranteIds) {
+        try {
+            service.inativarEmLote(restauranteIds);
+        } catch (RestauranteNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
+    }
+
+    @PutMapping("/{restauranteId}/abertura")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void abrir(@PathVariable Long restauranteId) {
+        service.abrir(restauranteId);
+    }
+
+    @PutMapping("/{restauranteId}/fechamento")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void fechar(@PathVariable Long restauranteId) {
+        service.fechar(restauranteId);
+    }
 }
