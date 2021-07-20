@@ -8,8 +8,10 @@ import com.algaworks.algafood.api.model.PedidoResumoDTO;
 import com.algaworks.algafood.api.model.input.PedidoInputDTO;
 import com.algaworks.algafood.domain.model.Pedido;
 import com.algaworks.algafood.domain.repository.PedidoRepository;
+import com.algaworks.algafood.domain.repository.filter.PedidoFilter;
 import com.algaworks.algafood.domain.service.ConsultaPedidoService;
 import com.algaworks.algafood.domain.service.EmissaoPedidoService;
+import com.algaworks.algafood.infrastructure.repository.spec.PedidoSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,8 +41,8 @@ public class PedidoController {
     private ConsultaPedidoService consultaPedidoService;
 
     @GetMapping
-    public List<PedidoResumoDTO> listar() {
-        List<Pedido> pedidos = pedidoRepository.findAll();
+    public List<PedidoResumoDTO> pesquisar(PedidoFilter filtro) {
+        List<Pedido> pedidos = pedidoRepository.findAll(PedidoSpecification.filtrarPedidos(filtro));
         return pedidoResumoDTOAssembler.toCollectionDTO(pedidos);
     }
 
