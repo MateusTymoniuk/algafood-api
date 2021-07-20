@@ -13,6 +13,9 @@ import com.algaworks.algafood.domain.service.ConsultaPedidoService;
 import com.algaworks.algafood.domain.service.EmissaoPedidoService;
 import com.algaworks.algafood.infrastructure.repository.spec.PedidoSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,9 +44,10 @@ public class PedidoController {
     private ConsultaPedidoService consultaPedidoService;
 
     @GetMapping
-    public List<PedidoResumoDTO> pesquisar(PedidoFilter filtro) {
-        List<Pedido> pedidos = pedidoRepository.findAll(PedidoSpecification.filtrarPedidos(filtro));
-        return pedidoResumoDTOAssembler.toCollectionDTO(pedidos);
+    public Page<PedidoResumoDTO> pesquisar(PedidoFilter filtro, Pageable pageable) {
+        Page<Pedido> pedidosPage = pedidoRepository.findAll(PedidoSpecification.filtrarPedidos(filtro), pageable);
+        List<PedidoResumoDTO> pedidosResumoDTO = pedidoResumoDTOAssembler.toCollectionDTO(pedidosPage.getContent());
+        return new PageImpl<>(pedidosResumoDTO, pageable, pedidosPage.getTotalElements());
     }
 
     @GetMapping("/{codigoPedido}")
@@ -53,7 +57,7 @@ public class PedidoController {
     }
 
     @PostMapping
-    public PedidoDTO  salvar(@RequestBody @Valid PedidoInputDTO pedidoInputDTO) {
+    public PedidoDTO salvar(@RequestBody @Valid PedidoInputDTO pedidoInputDTO) {
         Pedido pedido = pedidoInputDTODisassembler.toEntity(pedidoInputDTO);
         pedido = emissaoPedidoService.salvar(pedido);
         return pedidoDTOAssembler.toDTO(pedido);
