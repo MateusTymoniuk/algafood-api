@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface VendaDiariaRepository {
 
-    List<VendaDiaria> buscarRelatorio(VendaDiariaFilter filtro);
+    List<VendaDiaria> buscarRelatorio(VendaDiariaFilter filtro, String offset);
 }

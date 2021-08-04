@@ -115,7 +115,16 @@ INSERT INTO pedido (id, codigo, restaurante_id, cliente_id, forma_pagamento_id, 
         endereco_logradouro, endereco_numero, endereco_complemento, endereco_bairro,
         status, data_criacao, subtotal, taxa_frete, valor_total)
 VALUES (2, 'e94e60f2-f92f-4ad7-bb2f-dc4942fb7acf', 4, 1, 2, 1, '38400-111', 'Rua Acre', '300', 'Casa 2', 'Centro',
-'CRIADO', utc_timestamp, 79, 0, 79);
+'ENTREGUE', utc_timestamp, 79, 0, 79);
 
 INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)
 VALUES (3, 2, 6, 1, 79, 79, 'Ao ponto');
+
+INSERT INTO pedido (id, codigo, restaurante_id, cliente_id, forma_pagamento_id, endereco_cidade_id, endereco_cep,
+        endereco_logradouro, endereco_numero, endereco_complemento, endereco_bairro,
+        status, data_criacao, subtotal, taxa_frete, valor_total)
+VALUES (3, uuid(), 4, 1, 2, 1, '38400-111', 'Rua Acre', '300', 'Casa 2', 'Centro',
+'CONFIRMADO', '2021-07-23 01:57:03', 178.0, 12.0, 190.0);
+
+INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)
+VALUES (4, 3, 7, 2, 89.0, 178.0, 'Ao ponto');

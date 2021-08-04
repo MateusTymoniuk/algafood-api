@@ -21,20 +21,19 @@ public class VendaDiariaRepositoryImpl implements VendaDiariaRepository {
     private EntityManager em;
 
     @Override
-    public List<VendaDiaria> buscarRelatorio(VendaDiariaFilter filtro) {
+    public List<VendaDiaria> buscarRelatorio(VendaDiariaFilter filtro, String offset) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<VendaDiaria> query = criteriaBuilder.createQuery(VendaDiaria.class);
         Root<Pedido> root = query.from(Pedido.class);
 
-        Expression<Date> dateFunction = criteriaBuilder.function("date", Date.class, root.get("dataCriacao"));
+        Expression<Date> convertTzFunction = criteriaBuilder.function("convert_tz", Date.class,
+                root.get("dataCriacao"), criteriaBuilder.literal("+00:00"), criteriaBuilder.literal(offset));
+        Expression<Date> dateFunction = criteriaBuilder.function("date", Date.class, convertTzFunction);
 
         Selection<? extends VendaDiaria> select = criteriaBuilder.construct(VendaDiaria.class,
                 dateFunction,
                 criteriaBuilder.count(root.get("id")),
                 criteriaBuilder.sum(root.get("valorTotal")));
-
-        query.select(select);
-        query.groupBy(dateFunction);
 
         ArrayList<Predicate> predicates = new ArrayList<>();
 
@@ -52,7 +51,9 @@ public class VendaDiariaRepositoryImpl implements VendaDiariaRepository {
 
         predicates.add(root.get("status").in(StatusPedido.CONFIRMADO, StatusPedido.ENTREGUE));
 
+        query.select(select);
         query.where(predicates.toArray(new Predicate[0]));
+        query.groupBy(dateFunction);
 
         return em.createQuery(query).getResultList();
     }
