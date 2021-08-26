@@ -8,6 +8,7 @@ import com.algaworks.algafood.domain.model.Produto;
 import com.algaworks.algafood.domain.service.CadastroFotoProdutoService;
 import com.algaworks.algafood.domain.service.CadastroProdutoService;
 import com.algaworks.algafood.domain.service.FotoStorageService;
+import com.algaworks.algafood.domain.service.FotoStorageService.FotoRecuperada;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -47,8 +47,8 @@ public class RestauranteProdutoFotoController {
     }
 
     @GetMapping
-    public ResponseEntity<InputStreamResource> buscarArquivo(@PathVariable Long restauranteId, @PathVariable Long produtoId,
-                                                             @RequestHeader(name = HttpHeaders.ACCEPT) String nomesMediaTypesAceitos)
+    public ResponseEntity<?> buscarArquivo(@PathVariable Long restauranteId, @PathVariable Long produtoId,
+                                           @RequestHeader(name = HttpHeaders.ACCEPT) String nomesMediaTypesAceitos)
             throws HttpMediaTypeNotAcceptableException {
         FotoProduto fotoProduto = cadastroFotoProdutoService.buscar(restauranteId, produtoId);
 
@@ -57,11 +57,17 @@ public class RestauranteProdutoFotoController {
 
         verificarCompatibilidadeMediaTypes(mediaTypeFoto, mediaTypesAceitos);
 
-        InputStream arquivoFoto = fotoStorageService.recuperar(fotoProduto.getNomeArquivo());
+        FotoRecuperada fotoRecuperada = fotoStorageService.recuperar(fotoProduto.getNomeArquivo());
 
-        return ResponseEntity.ok()
-                .contentType(mediaTypeFoto)
-                .body(new InputStreamResource(arquivoFoto));
+        if (fotoRecuperada.temUrl()) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .header(HttpHeaders.LOCATION, fotoRecuperada.getUrl())
+                    .build();
+        } else {
+            return ResponseEntity.ok()
+                    .contentType(mediaTypeFoto)
+                    .body(new InputStreamResource(fotoRecuperada.getArquivoInputStream()));
+        }
     }
 
     private void verificarCompatibilidadeMediaTypes(MediaType mediaTypeFoto, List<MediaType> mediaTypesAceitos)
@@ -69,7 +75,7 @@ public class RestauranteProdutoFotoController {
         boolean isMediaTypeAceito = mediaTypesAceitos.stream()
                 .anyMatch(mediaTypeAceito -> mediaTypeAceito.isCompatibleWith(mediaTypeFoto));
 
-        if(!isMediaTypeAceito) {
+        if (!isMediaTypeAceito) {
             throw new HttpMediaTypeNotAcceptableException(mediaTypesAceitos);
         }
     }

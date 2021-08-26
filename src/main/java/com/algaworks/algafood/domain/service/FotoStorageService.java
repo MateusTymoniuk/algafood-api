@@ -13,7 +13,7 @@ public interface FotoStorageService {
 
     void excluir(String nomeFoto);
 
-    InputStream recuperar(String nomeArquivo);
+    FotoRecuperada recuperar(String nomeArquivo);
 
     default void substituir(NovaFoto novaFoto, String nomeAntigo) {
         this.armazenar(novaFoto);
@@ -36,5 +36,17 @@ public interface FotoStorageService {
     class NovaFoto {
         String nome;
         InputStream arquivoInputStream;
+        String contentType;
+    }
+
+    @Getter
+    @Builder
+    class FotoRecuperada {
+        InputStream arquivoInputStream;
+        String url;
+
+        public boolean temUrl() {
+            return url != null;
+        }
     }
 }
